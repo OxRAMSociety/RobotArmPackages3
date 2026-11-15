@@ -25,6 +25,9 @@ To use, execute `git clone https://github.com/OxRAMSociety/RobotArmPackages3.git
 4. Some sub-teams/tasks will have specific requirements for setup, follow the respective README.md to identify particular packages
 
 ## Helpful Resources
+### Sub Team READMEs
+- [Computer Vision](brain/computer_vision/README.md)
+
 ### Git
 [This](https://github.com/javedali99/git-tutorial) git tutorial is good for getting an intuition about how git works. Although there is one important difference - instead of using forks (which are your "version" of the entire repository), we are using branches (a different "version" of the code, stored in the same repository). [This guide](https://github.com/git-guides) is a bit more information on them, as well as another decent explanation of how git works.
 #### Quick guide for managing branches
