@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: 2026 Oliver Geer
+
 from abc import ABC, abstractmethod
 import weakref
 

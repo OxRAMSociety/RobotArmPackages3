@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: 2026 Oliver Geer
+
 from task_planning.task import Task
 
 class Move(Task[(PieceSquares, PieceName, Square)]):

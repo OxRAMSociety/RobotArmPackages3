@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: 2026 Oliver Geer
+
 from task_planning.wait import Wait
 from task_planning.think import Think
 from task_planning.move import Move
