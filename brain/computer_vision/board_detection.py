@@ -53,6 +53,7 @@ class ChessboardCorners():
     # Turns image gray scale, finds chessboard corners and draws on the corners
     # Logs: Chessboard detected, type of corners, grid positions
     def process_image(self, cv_image):
+        logger = self.get_logger()
         # Convert the image to grayscale
         gray = cv2.cvtColor(cv_image, cv2.COLOR_BGR2GRAY)
         # Chessboard size in squares(width and height)
@@ -61,6 +62,8 @@ class ChessboardCorners():
         ret, corners = cv2.findChessboardCorners(gray, board_size, None)  # MatLike
         # If the chessboard is detected, draw the grid and compute the grid positions
         if ret:
+            logger.info("Chessboard corners detected.")
+            logger.info(str(type(corners)))
             corners = cv2.cornerSubPix(
                 gray, corners, (3, 3), (-1, -1), (cv2.TERM_CRITERIA_EPS, 0, 0.00001)
             )  # More accurate corner detection
@@ -75,8 +78,13 @@ class ChessboardCorners():
                         (255, 0, 0),
                         1,
                     )
+            logger.info(str(type(corners)))
+            # Print the grid positions
+            logger.info("Grid positions:")
+            logger.info(corners)
             return (cv_image, corners)
         else:
+            logger.info("Chessboard corners not detected.")
             return None
 
     def on_new_camera_frame(self, img):
