@@ -1,9 +1,9 @@
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: GPL-3.0-or-later
 # SPDX-FileCopyrightText: 2026 Oliver Geer
 
-from task_planning.wait import Wait
-from task_planning.think import Think
-from task_planning.move import Move
+from brain.tasks.wait import Wait
+from brain.tasks.think import Think
+from brain.tasks.move import Move
 
 # TODO: Define the component classes used here/wait/think/move
 
@@ -17,9 +17,18 @@ async def run():
     think = new Think(camera, piece_squares_calculator, chess_engine)
     move = new Move(camera, arm)
 
-    while True:
-        piece_squares = await wait()
-        (piece_squares, piece_to_move, square_to_move_to) = await think(piece_squares)
-        await move(piece_squares, piece_to_move, square_to_move_to)
+    try:
+        while True:
+            board_state = await wait()
+
+            (board_state, square_to_move_from, square_to_move_to) = await think(board_state)
+
+            await move(board_state, square_to_move_from, square_to_move_to)
+
+    except KeyboardInterrupt:
+        print("Shutting down gracefully")
+        del wait; del think; del move
+        del camera; del piece_squares_calculator; del chess_engine
+        print("Shut down gracefully")
 
 run()

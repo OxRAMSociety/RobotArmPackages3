@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: GPL-3.0-or-later
 # SPDX-FileCopyrightText: 2026 Oliver Geer
 
 from abc import ABC, abstractmethod
@@ -10,8 +10,9 @@ class Component(ABC):
 
     Example:
     ```python
-    from typing import Int
     from random import randint
+
+    from brain.component import Component
 
     class MyComponent(Component):
         \"\"\"Produces the results of rolling dice and tossing coins, and when it has
@@ -21,11 +22,11 @@ class Component(ABC):
             self._num_dice = 0
             self._num_coins = 0
 
-        def roll_die():
+        def roll_die() -> int:
             self._num_dice += 1
             return randint(1, 6)
 
-        def toss_coin():
+        def toss_coin() -> str:
             self._num_coins += 1
             return "HT"[randint(0, 1)]
 

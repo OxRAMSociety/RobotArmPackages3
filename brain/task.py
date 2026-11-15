@@ -1,10 +1,10 @@
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: GPL-3.0-or-later
 # SPDX-FileCopyrightText: 2026 Oliver Geer
 
 from abc import ABC, abstractmethod
 from typing import TypeVar, Generic
 
-from task_planning.component import Component
+from brain.component import Component
 
 CallReturnType = TypeVar('CallReturnType')
 
@@ -16,7 +16,7 @@ class Task[CallReturnType](Component):
 
     Example:
     ```python
-    from typing import Int
+    from brain.task import Task
 
     class MyTask(Task[ComponentResult]):
         \"\"\"Use my_component to input an integer and output the result of the component after doing something that integer number of times.\"\"\"

@@ -1,7 +1,7 @@
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: GPL-3.0-or-later
 # SPDX-FileCopyrightText: 2026 Oliver Geer
 
-from task_planning.task import Task
+from brain.task import Task
 
 class Move(Task[(PieceSquares, PieceName, Square)]):
     """Use a camera and arm to input the piece squares, the piece to move, and the square to

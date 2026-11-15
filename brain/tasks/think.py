@@ -1,7 +1,7 @@
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: GPL-3.0-or-later
 # SPDX-FileCopyrightText: 2026 Oliver Geer
 
-from task_planning.task import Task
+from brain.task import Task
 
 class Think(Task[(PieceSquares, PieceName, Square)]):
     """Use a camera, piece squares calculator, and chess engine to input nothing and output
@@ -12,7 +12,7 @@ class Think(Task[(PieceSquares, PieceName, Square)]):
         self._piece_squares_calculator = piece_squares_calculator
         self._chess_engine = chess_engine
 
-    def on_call(piece_squares: PieceSquares) -> (PieceSquares, PieceName, Square):
+    def on_call(board_state: BoardState) -> (PieceSquares, Square, Square):
         # TODO
         pass
 

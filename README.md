@@ -21,3 +21,9 @@ Python concurrency libraries and not a framework like ROS2.
   pip install -r requirements.txt
   ```
 
+## Repository Structure
+
+- `brain/` contains code from the computer
+- `brain/components/` contains code for short- or long-lived components for running specific tasks like computer vision, for example. These classes extend `brain.component`.
+- `brain/structs/` contains common datatypes used between components.
+- `brain/tasks/` contains special components called tasks, which can be `await` called like asynchrnous functions after creation. These classes extend `brain.task`.
