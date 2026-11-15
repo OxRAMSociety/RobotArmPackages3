@@ -30,7 +30,6 @@ class HardwareBridge:
                 data = self.ser.read(self.ser.in_waiting).decode(encoding='UTF-8')
                 self._read_buffer += data
                 
-
     async def write(self, command):
         async with self.serial_lock:
             self.ser.write(command.encode(encoding='UTF-8'))

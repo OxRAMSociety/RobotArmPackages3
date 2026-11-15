@@ -1,0 +1,1 @@
+This is the package for controlling the arm. There are/will be a number of simple demos in the `demos` folder that can be used for testing and demonstrative purposes.

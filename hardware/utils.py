@@ -4,10 +4,13 @@ import serial
 
 def parse_parial_json(buffer):
     # a "possible json object" is either a complete json object, an unfinished json object, or malformed
-    # the buffer may be:
-    # - 
+    # inductively, the buffer may be:
+    # - empty
     # - complete json object
-    # - complete json object with the next 
+    # - possible json object + an unfinished json object
+    # - possible json object + complete json object
+    # - complete json object with an unfinished json object after it
+    # - 
 
 
 

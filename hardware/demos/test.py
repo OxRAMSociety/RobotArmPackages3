@@ -1,7 +1,7 @@
 import asyncio
 import logging
 
-from robot_arm import HardwareBridge, RobotArmBridge
+from hardware import HardwareBridge, RobotArmBridge
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)

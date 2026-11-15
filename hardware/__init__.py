@@ -1,4 +1,4 @@
-from robot_arm.hardware import (
+from hardware.hardware import (
     HardwareBridge, 
     RobotArmBridge
 )
