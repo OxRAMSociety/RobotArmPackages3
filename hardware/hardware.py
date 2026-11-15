@@ -3,11 +3,14 @@ import serial
 import logging
 import json
 
+from hardware.utils import parse_partial_json
+
 logger = logging.getLogger(__name__)
 
 
 class HardwareBridge:
     def __init__(self, port, baudrate):
+        loop = asyncio.get_running_loop()
         if port is None:
             # TODO: detect arduino automatically
             pass
@@ -16,20 +19,25 @@ class HardwareBridge:
         # Note: possible separate lock for ser.flush()?
         # self.flush_lock = asyncio.Lock()
         self.logger = logging.getLogger("HardwareBridge")
-        self._read_proccess_task = None
+        self._read_buffer = ""
+        self._read_data = []
+        self._read_process_task = loop.create_task(self._read_process())
 
     async def start_read_process(self):
-        if self._read_proccess_task is None:
-            self._read_proccess_task = asyncio.get_event_loop().create_task(self._read_process())
+        if self._read_process_task is None:
+            self._read_process_task = asyncio.get_running_loop().create_task(self._read_process())
 
     async def _read_process(self):
         self._read_buffer = ""
         while True:
             await asyncio.sleep(0.1)
             if self.ser.in_waiting:
-                data = self.ser.read(self.ser.in_waiting).decode(encoding='UTF-8')
+                data = await self.read()
                 self._read_buffer += data
-                
+                parsed_data, new_buffer = parse_partial_json(self._read_buffer)
+                self._read_data.extend(parsed_data)
+                self._read_buffer = new_buffer
+
     async def write(self, command):
         async with self.serial_lock:
             self.ser.write(command.encode(encoding='UTF-8'))
@@ -43,12 +51,20 @@ class HardwareBridge:
         ...
 
     async def close(self):
-        async with self.serial_lock:
-            self.ser.close()
+        try:
+            if self._read_process_task is not None:
+                self._read_process_task.cancel()
+                try:
+                    await self._read_process_task
+                except asyncio.CancelledError:
+                    pass
+        finally:
+            async with self.serial_lock:
+                self.ser.close()
 
 
 class RobotArmBridge:
-    def __init__(self, hardware_bridge, port='COM3', baudrate=115200):
+    def __init__(self, port='COM3', baudrate=115200):
         self.hardware_bridge = HardwareBridge(port=port, baudrate=baudrate)
         self.logger = logging.getLogger("RobotArmBridge")
 
@@ -72,23 +88,39 @@ class RobotArmBridge:
         await self.hardware_bridge.write(data + "\n")
 
     async def receive_response(self, max_wait=0.1, poll_delay=0.01):
-        with self.serial_lock:
-            # Wait for a message to come in
-            self.logger.debug("Waiting for response...")
-            start_time = asyncio.get_event_loop().time()
-            while not self.ser.in_waiting and asyncio.get_event_loop().time() - start_time <= max_wait:
-                await asyncio.sleep(poll_delay)
+        if max_wait < 0:
+            raise ValueError("max_wait must be non-negative")
+        if poll_delay <= 0:
+            raise ValueError("poll_delay must be positive")
 
-            # Wait while receiving message
-            self.logger.debug("Receiving message...")
-            response_lines = []
-            while self.hardware_bridge.ser.in_waiting:
-                line = await self.hardware_bridge.read()
-                self.logger.info("\033[95mReply from Arduino:\033[0m")
-                self.logger.info("< " + line)
-                response_lines.append(line)
-            return response_lines
+        await self.hardware_bridge.start_read_process()
+        self.logger.debug("Waiting for response...")
+        loop = asyncio.get_running_loop()
+        deadline = loop.time() + max_wait
+
+        while not self.hardware_bridge._read_data:
+            remaining = deadline - loop.time()
+            if remaining <= 0:
+                raise TimeoutError("Timed out waiting for a hardware response")
+            await asyncio.sleep(min(poll_delay, remaining))
+
+        response = self.hardware_bridge._read_data.pop(0)
+        self.logger.info("\033[95mReply from Arduino:\033[0m")
+        self.logger.info("< " + json.dumps(response))
+        return response
         
 
     async def move_motor(self, motor_id, position):
-        ...
+        motor_key = f"motor_{motor_id}"
+        match motor_id:
+            case 0:
+                factor = 30
+            case 1:
+                factor = 10
+            case 2:
+                factor = 50
+            case 3:
+                factor = 30
+            case _:
+                raise ValueError(f"Invalid motor_id: {motor_id}")
+        await self.send_command({motor_key: {"position": position  * factor}})
